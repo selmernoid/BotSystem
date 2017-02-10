@@ -47,6 +47,9 @@ namespace BotSystem {
                 IJobDetail job2 = JobBuilder.Create<NewsChecker>()
                     .WithIdentity("job2", "group1")
                     .Build();
+                IJobDetail job3 = JobBuilder.Create<PostCommentsGrabber>()
+                    .WithIdentity("job3", "group1")
+                    .Build();
 
                 // Trigger the job to run now, and then repeat every 10 seconds
                 ITrigger trigger = TriggerBuilder.Create()
@@ -63,6 +66,14 @@ namespace BotSystem {
                         .WithIntervalInSeconds(7)
                         .RepeatForever())
                     .Build();
+                ITrigger trigger3 = TriggerBuilder.Create()
+                    .WithIdentity("trigger3", "group1")
+                    .StartNow()
+//                    .WithSimpleSchedule(x => x
+//                        .WithIntervalInSeconds(15)
+//                        .RepeatForever()
+//                        )
+                    .Build();
 
                 // Tell quartz to schedule the job using our trigger
                 if (!scheduler.CheckExists(job.Key))
@@ -71,6 +82,9 @@ namespace BotSystem {
                 if (scheduler.CheckExists(job2.Key))
                     scheduler.DeleteJob(job2.Key);
                 scheduler.ScheduleJob(job2, trigger2);
+                if (scheduler.CheckExists(job3.Key))
+                    scheduler.DeleteJob(job3.Key);
+                scheduler.ScheduleJob(job3, trigger3);
 
                 // some sleep to show what's happening
                 Thread.Sleep(TimeSpan.FromSeconds(60));
