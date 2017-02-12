@@ -13,8 +13,11 @@ namespace DataContract {
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserComment> UserComments { get; set; }
 
+        public virtual DbSet<PostTag> Tags { get; set; }
         public virtual DbSet<PostLink> PostLinks { get; set; }
         public virtual DbSet<CommentLink> CommentLinks { get; set; }
+
+        public virtual DbSet<Log> Logs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
             modelBuilder.Entity<User>()

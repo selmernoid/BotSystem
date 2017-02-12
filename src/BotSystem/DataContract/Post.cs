@@ -8,7 +8,9 @@ namespace DataContract
 
     public partial class Post { 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
+//        public int Id { get; set; }
+        [Key]
+        public int Isd { get; set; }
 
         [StringLength(100)]
         public string Title { get; set; }

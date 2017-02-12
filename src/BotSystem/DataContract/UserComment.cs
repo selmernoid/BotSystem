@@ -16,13 +16,18 @@ namespace DataContract
 
         public bool IsPostAuthor { get; set; }
 
+        public int? ParentCommentId { get; set; }
+        public virtual UserComment ParentComment { get; set; }
+
         public int PostId { get; set; }
         public virtual Post Post { get; set; }
 
-        public int Rating { get; set; }
+        public int? Rating { get; set; }
         public string Content { get; set; }
 
         public DateTime Created { get; set; }
         public virtual ICollection<CommentLink> Links { get; set; }
+        public virtual ICollection<UserComment> ChildComments { get; set; }
+        public int Level { get; set; }
     }
 }

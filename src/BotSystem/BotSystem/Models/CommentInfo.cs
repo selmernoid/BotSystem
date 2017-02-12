@@ -11,6 +11,8 @@ namespace BotSystem {
         public string UserName { get; set; }
         public DateTime DateTime { get; set; }
         public string Content { get; set; }
-        public int Rating { get; set; }
+        public int? Rating { get; set; }
+        public int? ParentCommentId { get; set; }
+        public int Level { get; set; }
     }
 }

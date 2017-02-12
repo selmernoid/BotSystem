@@ -6,17 +6,27 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BotSystem.Jobs;
+using log4net;
 using Quartz;
 using Quartz.Impl;
 
 namespace BotSystem {
     class Program {
         static void Main(string[] args) {
+            ILog log = LogManager.GetLogger("Grabber");
 
+            for (int i = 0; i < 1000; i++) {
+                
+            var postId = 4801861+ i;
             try {
-                //                Common.Logging.LogManager.Adapter = new Common.Logging.Simple.ConsoleOutLoggerFactoryAdapter { Level = Common.Logging.LogLevel.Info };
+                PostCommentsGrabber.GragPost(postId);
+            } catch (Exception e) {
 
-
+                log.Error("Post #" + postId + " not processed.", e);
+            }
+                throw new NotImplementedException("Some logic");
+            }
+            try {
                 NameValueCollection properties = new NameValueCollection();
 
                 properties["quartz.scheduler.instanceName"] = "TestScheduler";

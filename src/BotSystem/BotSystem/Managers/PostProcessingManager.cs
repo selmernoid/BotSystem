@@ -20,13 +20,15 @@ namespace BotSystem {
             }
 
 
-            foreach (var comment in comments) {
+            foreach (var comment in comments.OrderBy(x=>x.Id)) {
                 db.UserComments.Add(new UserComment {
                     Id = comment.Id,
                     User = users[comment.UserName],
                     IsPostAuthor = comment.UserName.Equals(author),
                     Rating = comment.Rating,
                     PostId = postId,
+                    ParentCommentId = comment.ParentCommentId,
+                    Level = comment.Level,
                     Content = comment.Content,
                     Created = comment.DateTime
                 });
@@ -35,20 +37,36 @@ namespace BotSystem {
 
         }
 
-        public static void ProcessingPost(DataContext db, PostInfo post) {
+//        public static void ProcessingPost(DataContext db, PostInfo post) {
+//
+//                var user = db.Users.FirstOrDefault(x => x.Name.ToLower() == post.UserName.ToLower());
+//                if (user == null)
+//                    db.Users.Add(user = new User { Name = post.UserName });
+//
+//            db.Posts.Add(new Post {
+//                Id = post.Id,
+//                Title = post.Title,
+//                Rating = post.Rating,
+//                Author = user,
+//                Content = post.Content,
+//                CommentsCount = post.CommentsCount
+//            });
+//        }
 
-                var user = db.Users.FirstOrDefault(x => x.Name.ToLower() == post.UserName.ToLower());
-                if (user == null)
-                    db.Users.Add(user = new User { Name = post.UserName });
+        public static void ProcessingTags(DataContext db, Post post, List<string> tags) {
+            var toAdd = tags.Where(x => post.Tags.All(t => t.Name != x)).ToList();
+            var toRemove = post.Tags.Where(x => !tags.Contains(x.Name)).ToList();
 
-            db.Posts.Add(new Post {
-                Id = post.Id,
-                Title = post.Title,
-                Rating = post.Rating,
-                Author = user,
-                Content = post.Content,
-                CommentsCount = post.CommentsCount
-            });
+            foreach (var postTag in toRemove) {
+                post.Tags.Remove(postTag);
+            }
+
+            foreach (var newTag in toAdd) {
+                var tag = db.Tags.FirstOrDefault(x => x.Name == newTag);
+                if (tag == null)
+                    db.Tags.Add(new PostTag {Name = newTag});
+                post.Tags.Add(tag);
+            }
         }
     }
 }
