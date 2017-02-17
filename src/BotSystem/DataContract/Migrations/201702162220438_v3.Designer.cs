@@ -13,7 +13,7 @@ namespace DataContract.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201702121200000_v3"; }
+            get { return "201702162220438_v3"; }
         }
         
         string IMigrationMetadata.Source

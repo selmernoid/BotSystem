@@ -8,11 +8,9 @@ namespace DataContract
 
     public partial class Post { 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-//        public int Id { get; set; }
-        [Key]
-        public int Isd { get; set; }
+        public int Id { get; set; }
 
-        [StringLength(100)]
+        [StringLength(142)]
         public string Title { get; set; }
 
         public string Content { get; set; }
@@ -23,8 +21,10 @@ namespace DataContract
 
 
 
+        public bool IsDeleted { get; set; }
         public bool IsLong { get; set; }
         public bool IsMine { get; set; }
+        public bool IsStraw { get; set; }
         [StringLength(20)]
         public string Type { get; set; }
         public int CommentsCount { get; set; }
@@ -34,7 +34,9 @@ namespace DataContract
 
         public TimeSpan? ProcessedTime { get; set; }
         public DateTime LastCheck { get; set; }
-
+        
+        public int? CommunityId { get; set; }
+        public virtual Community Community { get; set; }
 
 
         public virtual ICollection<PostTag> Tags { get; set; }

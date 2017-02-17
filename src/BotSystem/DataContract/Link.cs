@@ -11,8 +11,9 @@ namespace DataContract
 
         public LinkType Type { get; set; }
 
-        [Index]
         public int? UserId { get; set; }
+        public virtual User User { get; set; }
+
         [Index]
         public int? OtherPostId { get; set; }
         [Index]
@@ -20,6 +21,8 @@ namespace DataContract
         [Index, StringLength(890)]
         public string Url { get; set; }
 
+        [StringLength(50)]
+        public string DataId { get; set; }
     }
 
     public class CommentLink : LinkBase {
@@ -34,13 +37,16 @@ namespace DataContract
     public enum LinkType {
         None = 0,
 
-        User        = 1,
-        Post        = 2,
-        Comment     = 3,
-        Image       = 4,
-        Gif         = 5,
-        Video       = 6,
-        ExternalUrl = 7,
+        User          = 1,
+        Post          = 2,
+        Comment       = 3,
+        Image         = 4,
+        Gif           = 5,
+        Video         = 6,
+        ExternalUrl   = 7,
+        ExternalAwayUrl = 8,
+
+        NotRecognized = 100,
 
 
     }

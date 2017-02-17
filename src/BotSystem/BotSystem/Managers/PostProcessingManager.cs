@@ -21,7 +21,8 @@ namespace BotSystem {
 
 
             foreach (var comment in comments.OrderBy(x=>x.Id)) {
-                db.UserComments.Add(new UserComment {
+                UserComment uc;
+                db.UserComments.Add(uc = new UserComment {
                     Id = comment.Id,
                     User = users[comment.UserName],
                     IsPostAuthor = comment.UserName.Equals(author),
@@ -30,8 +31,12 @@ namespace BotSystem {
                     ParentCommentId = comment.ParentCommentId,
                     Level = comment.Level,
                     Content = comment.Content,
-                    Created = comment.DateTime
+                    Created = comment.DateTime,
+                    Links = new List<CommentLink>()
                 });
+                foreach (var link in comment.Links) {
+                    uc.Links.Add(link);
+                }
             }
 
 

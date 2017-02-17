@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataContract;
 
 namespace BotSystem {
 
@@ -14,5 +15,6 @@ namespace BotSystem {
         public int? Rating { get; set; }
         public int? ParentCommentId { get; set; }
         public int Level { get; set; }
+        public List<CommentLink> Links { get; set; }
     }
 }

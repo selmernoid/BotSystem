@@ -6,26 +6,54 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BotSystem.Jobs;
+using DataContract;
 using log4net;
 using Quartz;
 using Quartz.Impl;
 
 namespace BotSystem {
     class Program {
+        static int? GetNextPostId(DataContext db) {
+            return db.Database.SqlQuery<int?>($@"UPDATE [Settings]
+SET ValueInt = ValueInt + 1
+OUTPUT deleted.ValueInt
+WHERE Name = 'CurrentPostId'").FirstOrDefault();
+        }
         static void Main(string[] args) {
             ILog log = LogManager.GetLogger("Grabber");
 
-            for (int i = 0; i < 1000; i++) {
-                
-            var postId = 4801861+ i;
-            try {
-                PostCommentsGrabber.GragPost(postId);
-            } catch (Exception e) {
+            using (var db = new DataContext()) {
+                var maxPostId = db.Settings.FirstOrDefault(x => x.Name == "MaxPostId").ValueInt;
+                var postId = GetNextPostId(db);
 
-                log.Error("Post #" + postId + " not processed.", e);
+                while (maxPostId >= postId) {
+                    try {
+                        PostCommentsGrabber.GragPost(postId.Value);
+                    } catch (Exception e) {
+                        log.Error("Post #" + postId + " not processed.", e);
+                    }
+                    if (postId%10 == 0) {
+                        Console.Write("*");
+                        if (postId % 100 == 0)
+                            Console.WriteLine($"{postId} -> ");
+                    }
+                    postId = GetNextPostId(db);
+                }
             }
-                throw new NotImplementedException("Some logic");
+            return;
+            for (int i = 3; i < 1000; i++) {
+
+                var postId = 4801861 + i;
+                try {
+                    PostCommentsGrabber.GragPost(postId);
+                }
+                catch (Exception e) {
+
+                    log.Error("Post #" + postId + " not processed.", e);
+                }
             }
+            throw new NotImplementedException("Some logic");
+
             try {
                 NameValueCollection properties = new NameValueCollection();
 

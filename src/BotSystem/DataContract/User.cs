@@ -8,8 +8,6 @@ namespace DataContract
 
     public partial class User
     {
-
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         [StringLength(100), Index]

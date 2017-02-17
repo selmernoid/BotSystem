@@ -57,41 +57,49 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Community.cs" />
     <Compile Include="DataContext.cs" />
     <Compile Include="Log.cs" />
-    <Compile Include="Migrations\201702101911449_InitialCreate.cs" />
-    <Compile Include="Migrations\201702101911449_InitialCreate.Designer.cs">
-      <DependentUpon>201702101911449_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\201702121857488_v.cs" />
+    <Compile Include="Migrations\201702121857488_v.Designer.cs">
+      <DependentUpon>201702121857488_v.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702101913196_v.cs" />
-    <Compile Include="Migrations\201702101913196_v.Designer.cs">
-      <DependentUpon>201702101913196_v.cs</DependentUpon>
+    <Compile Include="Migrations\201702162114370_v1.cs" />
+    <Compile Include="Migrations\201702162114370_v1.Designer.cs">
+      <DependentUpon>201702162114370_v1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702101945214_v1.cs" />
-    <Compile Include="Migrations\201702101945214_v1.Designer.cs">
-      <DependentUpon>201702101945214_v1.cs</DependentUpon>
+    <Compile Include="Migrations\201702162122332_v2.cs" />
+    <Compile Include="Migrations\201702162122332_v2.Designer.cs">
+      <DependentUpon>201702162122332_v2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702102054335_v2.cs" />
-    <Compile Include="Migrations\201702102054335_v2.Designer.cs">
-      <DependentUpon>201702102054335_v2.cs</DependentUpon>
+    <Compile Include="Migrations\201702162220438_v3.cs" />
+    <Compile Include="Migrations\201702162220438_v3.Designer.cs">
+      <DependentUpon>201702162220438_v3.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702121200000_v3.cs" />
-    <Compile Include="Migrations\201702121200000_v3.Designer.cs">
-      <DependentUpon>201702121200000_v3.cs</DependentUpon>
+    <Compile Include="Migrations\201702162337524_v4.cs" />
+    <Compile Include="Migrations\201702162337524_v4.Designer.cs">
+      <DependentUpon>201702162337524_v4.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702121220502_v4.cs" />
-    <Compile Include="Migrations\201702121220502_v4.Designer.cs">
-      <DependentUpon>201702121220502_v4.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201702121428192_v5.cs" />
-    <Compile Include="Migrations\201702121428192_v5.Designer.cs">
-      <DependentUpon>201702121428192_v5.cs</DependentUpon>
+    <Compile Include="Migrations\201702172129021_v5.cs" />
+    <Compile Include="Migrations\201702172129021_v5.Designer.cs">
+      <DependentUpon>201702172129021_v5.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PostTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="Link.cs" />
+    <Compile Include="Setting.cs" />
+    <EmbeddedResource Include="Migrations\201702162220438_v3.resx">
+      <DependentUpon>201702162220438_v3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702162337524_v4.resx">
+      <DependentUpon>201702162337524_v4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702172129021_v5.resx">
+      <DependentUpon>201702172129021_v5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sql\DefaultSettings.sql" />
     <Compile Include="UserComment.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
@@ -102,28 +110,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201702101911449_InitialCreate.resx">
-      <DependentUpon>201702101911449_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201702121857488_v.resx">
+      <DependentUpon>201702121857488_v.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702101913196_v.resx">
-      <DependentUpon>201702101913196_v.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201702162114370_v1.resx">
+      <DependentUpon>201702162114370_v1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702101945214_v1.resx">
-      <DependentUpon>201702101945214_v1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702102054335_v2.resx">
-      <DependentUpon>201702102054335_v2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702121200000_v3.resx">
-      <DependentUpon>201702121200000_v3.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702121220502_v4.resx">
-      <DependentUpon>201702121220502_v4.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702121428192_v5.resx">
-      <DependentUpon>201702121428192_v5.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201702162122332_v2.resx">
+      <DependentUpon>201702162122332_v2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
