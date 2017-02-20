@@ -8,56 +8,46 @@ using DataContract;
 namespace BotSystem {
     public class PostProcessingManager {
 
+        public static User GetUser(DataContext db, string username) {
+            var user =
+                db.Users.Local.FirstOrDefault(x => x.Name == username) ??
+                db.Users.FirstOrDefault(x => x.Name == username);
+            if (user == null)
+                db.Users.Add(user = new User {Name = username});
+            return user;
+        }
+
         public static void ProcessingComment(DataContext db, int postId, IEnumerable<CommentInfo> comments, string author) {
             
             Dictionary<string, User> users = new Dictionary<string, User>();
 
             foreach (var userName in comments.Select(x => x.UserName).Distinct()) {
-                var user = db.Users.FirstOrDefault(x => x.Name.ToLower() == userName.ToLower());
-                if (user == null)
-                    db.Users.Add(user = new User {Name = userName});
-                users[userName] = user;
+                users[userName] = GetUser(db, userName);
             }
 
-
-            foreach (var comment in comments.OrderBy(x=>x.Id)) {
-                UserComment uc;
-                db.UserComments.Add(uc = new UserComment {
-                    Id = comment.Id,
-                    User = users[comment.UserName],
-                    IsPostAuthor = comment.UserName.Equals(author),
-                    Rating = comment.Rating,
-                    PostId = postId,
-                    ParentCommentId = comment.ParentCommentId,
-                    Level = comment.Level,
-                    Content = comment.Content,
-                    Created = comment.DateTime,
-                    Links = new List<CommentLink>()
-                });
-                foreach (var link in comment.Links) {
-                    uc.Links.Add(link);
+            db.Configuration.AutoDetectChangesEnabled = false;
+            try {
+                foreach (var comment in comments.OrderBy(x => x.Id)) {
+                    UserComment uc;
+                    db.UserComments.Add(uc = new UserComment {
+                        Id = comment.Id,
+                        User = users[comment.UserName],
+                        IsPostAuthor = comment.UserName.Equals(author),
+                        Rating = comment.Rating,
+                        PostId = postId,
+                        ParentCommentId = comment.ParentCommentId,
+                        Level = comment.Level,
+                        Content = comment.Content,
+                        Created = comment.DateTime,
+                        Links = comment.Links
+                    });
                 }
             }
-
-
+            finally {
+                db.Configuration.AutoDetectChangesEnabled = true;
+            }
         }
-
-//        public static void ProcessingPost(DataContext db, PostInfo post) {
-//
-//                var user = db.Users.FirstOrDefault(x => x.Name.ToLower() == post.UserName.ToLower());
-//                if (user == null)
-//                    db.Users.Add(user = new User { Name = post.UserName });
-//
-//            db.Posts.Add(new Post {
-//                Id = post.Id,
-//                Title = post.Title,
-//                Rating = post.Rating,
-//                Author = user,
-//                Content = post.Content,
-//                CommentsCount = post.CommentsCount
-//            });
-//        }
-
+        
         public static void ProcessingTags(DataContext db, Post post, List<string> tags) {
             var toAdd = tags.Where(x => post.Tags.All(t => t.Name != x)).ToList();
             var toRemove = post.Tags.Where(x => !tags.Contains(x.Name)).ToList();

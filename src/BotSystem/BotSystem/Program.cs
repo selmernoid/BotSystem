@@ -19,9 +19,10 @@ SET ValueInt = ValueInt + 1
 OUTPUT deleted.ValueInt
 WHERE Name = 'CurrentPostId'").FirstOrDefault();
         }
+
         static void Main(string[] args) {
             ILog log = LogManager.GetLogger("Grabber");
-
+            Console.ReadKey();
             using (var db = new DataContext()) {
                 var maxPostId = db.Settings.FirstOrDefault(x => x.Name == "MaxPostId").ValueInt;
                 var postId = GetNextPostId(db);
@@ -29,31 +30,40 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
                 while (maxPostId >= postId) {
                     try {
                         PostCommentsGrabber.GragPost(postId.Value);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         log.Error("Post #" + postId + " not processed.", e);
                     }
+
+
                     if (postId%10 == 0) {
+                        if (postId%100 == 0) {
+                            Console.WriteLine();
+                            Console.Write($"{postId} -> ");
+                        }
                         Console.Write("*");
-                        if (postId % 100 == 0)
-                            Console.WriteLine($"{postId} -> ");
                     }
                     postId = GetNextPostId(db);
                 }
             }
-            return;
-            for (int i = 3; i < 1000; i++) {
+        }
 
-                var postId = 4801861 + i;
+        static void ProcessLongPost(string[] args) {
+            ILog log = LogManager.GetLogger("Grabber");
+            var postId = 2;
+            using (var db = new DataContext()) {
                 try {
                     PostCommentsGrabber.GragPost(postId);
                 }
                 catch (Exception e) {
-
                     log.Error("Post #" + postId + " not processed.", e);
                 }
-            }
-            throw new NotImplementedException("Some logic");
 
+            }
+        }
+
+
+        static void Quartz(string[] args) {
             try {
                 NameValueCollection properties = new NameValueCollection();
 
@@ -73,7 +83,7 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
                 ISchedulerFactory sf = new StdSchedulerFactory(properties);
                 // Grab the Scheduler instance from the Factory 
                 IScheduler scheduler = sf.GetScheduler();
-//                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                //                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
 
                 // and start it off
                 scheduler.Start();
@@ -107,10 +117,10 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
                 ITrigger trigger3 = TriggerBuilder.Create()
                     .WithIdentity("trigger3", "group1")
                     .StartNow()
-//                    .WithSimpleSchedule(x => x
-//                        .WithIntervalInSeconds(15)
-//                        .RepeatForever()
-//                        )
+                    //                    .WithSimpleSchedule(x => x
+                    //                        .WithIntervalInSeconds(15)
+                    //                        .RepeatForever()
+                    //                        )
                     .Build();
 
                 // Tell quartz to schedule the job using our trigger

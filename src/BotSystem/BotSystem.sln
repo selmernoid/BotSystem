@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotSystem", "BotSystem\BotS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataContract", "DataContract\DataContract.csproj", "{130A23BD-E3CA-487A-A5B9-2918FCF1D93C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTesting", "PerformanceTesting\PerformanceTesting.csproj", "{4C0670C5-6CF2-4CD6-BA72-8189B904EA0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{130A23BD-E3CA-487A-A5B9-2918FCF1D93C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{130A23BD-E3CA-487A-A5B9-2918FCF1D93C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{130A23BD-E3CA-487A-A5B9-2918FCF1D93C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C0670C5-6CF2-4CD6-BA72-8189B904EA0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C0670C5-6CF2-4CD6-BA72-8189B904EA0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C0670C5-6CF2-4CD6-BA72-8189B904EA0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C0670C5-6CF2-4CD6-BA72-8189B904EA0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

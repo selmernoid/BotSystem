@@ -17,6 +17,7 @@ using Quartz;
 namespace BotSystem.Jobs {
     public class PostCommentsGrabber : IJob {
         private static readonly ILog log = LogManager.GetLogger("Grabber");
+
         public static void GragPost(int postId) {
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -24,9 +25,9 @@ namespace BotSystem.Jobs {
             //            throw new NotSupportedException("log4 testing");
 
 
-                HtmlDocument html = new HtmlDocument();
+            HtmlDocument html = new HtmlDocument();
             using (WebClient client = new WebClient()) {
-                html.LoadHtml(client.DownloadString(UrlConstants.SpecifiedPost+ postId));
+                html.LoadHtml(client.DownloadString(UrlConstants.SpecifiedPost + postId));
             }
             var processingDateTime = DateTime.Now;
 
@@ -37,58 +38,72 @@ namespace BotSystem.Jobs {
             if (authorName == "ads")
                 return;
 
+
+            // empty link video url
+
+            // removed comment
+
             var comments = html.QuerySelectorAll(".b-comments_type_main .b-comment");
             var commentInfos = new List<CommentInfo>();
 
             using (var db = new DataContext()) {
                 foreach (var comment in comments) {
-                var parentId = int.Parse(comment.Attributes.AttributesWithName("data-parent-id").FirstOrDefault().Value);
-                var commentId = int.Parse(comment.Attributes.AttributesWithName("data-id").FirstOrDefault().Value);
-                var userName = comment.QuerySelector(".b-comment__user a span").InnerText;
-                var content = comment.QuerySelector(".b-comment__content").InnerHtml;
-                var notYetCommentRate = comment.QuerySelectorAll(".b-comment__rating-count i").Any();
-                var level = int.Parse(comment.Attributes.AttributesWithName("data-level").FirstOrDefault().Value);
-                var commentDateTime = Helper.UnixTimeStampToDateTime(
-                    double.Parse(
-                        comment.QuerySelector(".b-comment__user time.b-comment__time").Attributes.AttributesWithName("datetime").FirstOrDefault().Value));
-                var commentInfo = new CommentInfo {
-                    Id = commentId,
-                    UserName = userName,
-                    Content = content,
-                    Rating = notYetCommentRate ? (int?)null : int.Parse(comment.QuerySelector(".b-comment__rating-count").InnerText),
-                    ParentCommentId = parentId == 0 ? (int?) null : parentId,
-                    Level = level,
-                    DateTime = commentDateTime,
-                    Links = new List<CommentLink>()
-                };
+                    var parentId = int.Parse(comment.Attributes.AttributesWithName("data-parent-id").FirstOrDefault().Value);
+                    var commentId = int.Parse(comment.Attributes.AttributesWithName("data-id").FirstOrDefault().Value);
 
-                comment.QuerySelector(".b-comment__content").QuerySelectorAll(".b-p_type_image > div.b-gifx > a")
-                    .Select(x => x.GetAttributeValue("href", null)).ToList().ForEach(
-                    (address) => {
-                        commentInfo.Links.Add(new CommentLink {
-                            Url = address,
-                            Type = LinkType.Gif
-                        });
-                    });
-                comment.QuerySelector(".b-comment__content").QuerySelectorAll("noindex > a[rel=\"nofollow\"]")
-                    .Select(x => x.GetAttributeValue("href", null)).ToList().ForEach(
-                    (address) => {
-                        var link = GetRefLinkByUrl<CommentLink>(address, db);
-                        commentInfo.Links.Add(link);
-                    });
-                commentInfos.Add(commentInfo);
-            }
 
-                var user = db.Users.FirstOrDefault(x => x.Name.ToLower() == authorName) ;
-                if (user == null)
-                    db.Users.Add(user = new User {Name = authorName});
+                    var tempHeader = comment.QuerySelector(".b-comment__header");
+                    var tempUser = tempHeader.QuerySelector(".b-comment__user");
+                    var tempRate = tempHeader.QuerySelector(".b-comment__rating-count");
+
+                    var notYetCommentRate = tempRate.QuerySelector("i") != null;
+                    var userName = tempUser.QuerySelector("a span").InnerText;
+                    var commentDateTime = Helper.UnixTimeStampToDateTime(
+                        double.Parse(
+                            tempUser.QuerySelector("time.b-comment__time").Attributes.AttributesWithName("datetime").FirstOrDefault().Value));
+//                    var content = tempHeader.QuerySelector(".b-comment__content");
+                    HtmlNode content = tempHeader.NextSibling;
+                    while (content.GetAttributeValue("class",null) != "b-comment__content") {
+                        content = content.NextSibling;
+                    }
+
+                    var level = int.Parse(comment.Attributes.AttributesWithName("data-level").FirstOrDefault().Value);
+                    var commentInfo = new CommentInfo {
+                        Id = commentId,
+                        UserName = userName,
+                        Content = content.InnerHtml,
+                        Rating = notYetCommentRate ? (int?) null : int.Parse(tempRate.InnerText),
+                        ParentCommentId = parentId == 0 ? (int?) null : parentId,
+                        Level = level,
+                        DateTime = commentDateTime,
+                        Links = new List<CommentLink>()
+                    };
+
+                    content.QuerySelectorAll(".b-p_type_image > div.b-gifx > a")
+                        .Select(x => x.GetAttributeValue("href", null)).ToList().ForEach(
+                            (address) => {
+                                commentInfo.Links.Add(new CommentLink {
+                                    Url = address,
+                                    Type = LinkType.Gif
+                                });
+                            });
+                    content.QuerySelectorAll("noindex > a[rel=\"nofollow\"]")
+                        .Select(x => x.GetAttributeValue("href", null)).ToList().ForEach(
+                            (address) => {
+                                var link = GetRefLinkByUrl<CommentLink>(address, db);
+                                commentInfo.Links.Add(link);
+                            });
+                    commentInfos.Add(commentInfo);
+                }
+
+                var user = PostProcessingManager.GetUser(db, authorName);
 
                 var postInfoNode = post.QuerySelector(".story__toggle-button");
                 Post dbPostEntry;
 
 
                 var postRate = post.QuerySelector(".story__rating-count");
-                var isDeleted = postRate.QuerySelectorAll("i.i-sprite--feed__rating-trash").Any();//4801869 deleted
+                var isDeleted = postRate.QuerySelectorAll("i.i-sprite--feed__rating-trash").Any(); //4801869 deleted
                 var rateNotAvailable = postRate.QuerySelectorAll("i").Any();
                 var postTitle = post.QuerySelector(".story__header-title a.story__title-link").InnerText;
                 var postContent = post.QuerySelector(".b-story__content")?.InnerHtml;
@@ -107,7 +122,7 @@ namespace BotSystem.Jobs {
 
                     CommentsCount = commentsCount,
                     IsDeleted = isDeleted,
-                    Rating = rateNotAvailable ? (int?)null : int.Parse(postRate.InnerText),
+                    Rating = rateNotAvailable ? (int?) null : int.Parse(postRate.InnerText),
                     Author = user,
                     Type = postType,
                     IsLong = isLong,
@@ -129,33 +144,29 @@ namespace BotSystem.Jobs {
                         });
                     dbPostEntry.Community = community;
                 }
+                var a = db.ChangeTracker.Entries().Where(e => e.State != System.Data.Entity.EntityState.Unchanged).ToList();
+                var a2 = db.ChangeTracker.Entries().Where(e => e.State == System.Data.Entity.EntityState.Added).ToList();
                 db.SaveChanges();
-                PostProcessingManager.ProcessingTags(db, dbPostEntry, post.QuerySelectorAll(".story__tag").Select(x=>x.InnerText).ToList());
+                PostProcessingManager.ProcessingTags(db, dbPostEntry, post.QuerySelectorAll(".story__tag").Select(x => x.InnerText).ToList());
                 post.QuerySelectorAll("[data-large-image]")
-                    .Select(x => x.GetAttributeValue("data-large-image", null)).ToList().ForEach((link) => {
+                    .Select(x => x.ParentNode.GetAttributeValue("href", null)).ToList().ForEach((link) => {
                         dbPostEntry.PostLinks.Add(
-                        new PostLink {
-                            Url = link,
-                            Type = LinkType.Image
-                        });
+                            new PostLink {
+                                Url = link,
+                                Type = LinkType.Image
+                            });
                     });
                 post.QuerySelectorAll(".b-video")
-                    .Select(x =>
-                        new PostLink {
-                            Url = x.GetAttributeValue("data-url", null),
-                            DataId = x.GetAttributeValue("data-id", null),
+                    .Select(x => {
+                        var url = x.GetAttributeValue("data-url", null);
+                        return new PostLink {
+                            Url = url,
+                            DataId = //postType == "video" ?
+                                url.Substring(url.LastIndexOf('/') + 1),
+                            //VideoCodeRegex.Match(url).Value : x.GetAttributeValue("data-id", null),
                             Type = LinkType.Video
-                        }
-                    ).ToList().ForEach((link) => {
-                        dbPostEntry.PostLinks.Add(link);
-                    });
-                post.QuerySelectorAll(".b-story-block.b-story-block_type_text a")
-                    .Select(x =>
-                        new PostLink {
-                            Url = x.GetAttributeValue("href", null),
-                            Type = LinkType.ExternalUrl
-                        }
-                    ).ToList().ForEach((link) => {
+                        };
+                    }).ToList().ForEach((link) => {
                         dbPostEntry.PostLinks.Add(link);
                     });
                 post.QuerySelectorAll(".b-gifx__player")
@@ -169,10 +180,10 @@ namespace BotSystem.Jobs {
                     });
                 post.QuerySelectorAll("noindex > a[rel=\"nofollow\"]")
                     .Select(x => x.GetAttributeValue("href", null)).ToList().ForEach(
-                    (address) => {
-                        var link = GetRefLinkByUrl<PostLink>(address, db);
-                        dbPostEntry.PostLinks.Add(link);
-                    });
+                        (address) => {
+                            var link = GetRefLinkByUrl<PostLink>(address, db);
+                            dbPostEntry.PostLinks.Add(link);
+                        });
                 db.SaveChanges();
                 timer.Stop();
                 dbPostEntry.ProcessedTime = timer.Elapsed;
@@ -214,10 +225,7 @@ namespace BotSystem.Jobs {
                 else if (ProfileRegex.IsMatch(url.AbsolutePath)) {
                     link.Type = LinkType.User;
                     var userName = url.Segments[2];
-                    var userRef = db.Users.FirstOrDefault(x => x.Name == userName);
-                    if (userRef == null)
-                        db.Users.Add(userRef = new User {Name = userName});
-                    link.User = userRef;
+                    link.User = PostProcessingManager.GetUser(db, userName);
                 }
                 else
                     link.Type = LinkType.NotRecognized;
