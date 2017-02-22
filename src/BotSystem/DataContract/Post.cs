@@ -16,7 +16,8 @@ namespace DataContract
         public string Content { get; set; }
         public int? Rating { get; set; }
 
-        public int AuthorId { get; set; }
+        public string AuthorName { get; set; }
+        public int? AuthorId { get; set; }
         public virtual User Author { get; set; }
 
 

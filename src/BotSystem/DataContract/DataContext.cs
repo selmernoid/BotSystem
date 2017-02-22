@@ -28,7 +28,7 @@ namespace DataContract {
 
             modelBuilder.Entity<User>()
                 .HasMany(e => e.UserComments)
-                .WithRequired(e => e.User)
+                .WithOptional(e => e.User)
                 .HasForeignKey(e => e.UserId)
                 .WillCascadeOnDelete(false);
         }

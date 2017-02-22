@@ -84,6 +84,14 @@
     <Compile Include="Migrations\201702172129021_v5.Designer.cs">
       <DependentUpon>201702172129021_v5.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201702211915150_v6.cs" />
+    <Compile Include="Migrations\201702211915150_v6.Designer.cs">
+      <DependentUpon>201702211915150_v6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201702212324009_v7.cs" />
+    <Compile Include="Migrations\201702212324009_v7.Designer.cs">
+      <DependentUpon>201702212324009_v7.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PostTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -98,6 +106,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201702172129021_v5.resx">
       <DependentUpon>201702172129021_v5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702211915150_v6.resx">
+      <DependentUpon>201702211915150_v6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201702212324009_v7.resx">
+      <DependentUpon>201702212324009_v7.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sql\DefaultSettings.sql" />
     <Compile Include="UserComment.cs" />

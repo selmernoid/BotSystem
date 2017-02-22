@@ -11,10 +11,10 @@ namespace PerformanceTesting {
     class Program {
         static void Main(string[] args) {
             ILog log = LogManager.GetLogger("Grabber");
-            var postId = 4820005; //4820359;
+            var postId = 4820359;
             using (var db = new DataContext()) {
                 try {
-                    PostCommentsGrabber.GragPost(postId);
+                    new PostCommentsGrabber().GragPost(postId);
                 } catch (Exception e) {
                     log.Error("Post #" + postId + " not processed.", e);
                 }

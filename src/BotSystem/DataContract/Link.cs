@@ -11,6 +11,7 @@ namespace DataContract
 
         public LinkType Type { get; set; }
 
+        public string UserName { get; set; }
         public int? UserId { get; set; }
         public virtual User User { get; set; }
 

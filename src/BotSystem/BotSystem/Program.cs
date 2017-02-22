@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,28 +24,81 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
         static void Main(string[] args) {
             ILog log = LogManager.GetLogger("Grabber");
             Console.ReadKey();
+            int? postId, maxPostId;
             using (var db = new DataContext()) {
-                var maxPostId = db.Settings.FirstOrDefault(x => x.Name == "MaxPostId").ValueInt;
-                var postId = GetNextPostId(db);
-
-                while (maxPostId >= postId) {
+                maxPostId = db.Settings.FirstOrDefault(x => x.Name == "MaxPostId").ValueInt;
+//                postId = GetNextPostId(db);
+            }
+            Task task = null;
+            //            foreach (var Id in GetEnumerablePosts(maxPostId.Value)) {
+            //                try {
+            //                    new PostCommentsGrabber().GragPost(Id);
+            //                } catch (Exception e) {
+            //                    log.Error("Post #" + Id + " not processed.", e);
+            //                }
+            //            }
+            //return;                
+            var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount / 2  };
+            var timer = new Stopwatch();
+            timer.Start();
+            Parallel.ForEach(GetEnumerablePosts(maxPostId.Value), options, (Id) => {
+                try {
+                    new PostCommentsGrabber().GragPost(Id);
+                } catch (Exception e) {
+                    log.Error("Post #" + Id + " not processed.", e);
+                }
+            });
+            timer.Stop();
+            Console.WriteLine();
+            Console.WriteLine(timer.Elapsed);
+            Console.ReadKey();
+            return;
+            while (maxPostId >= postId) {
+                if (task != null)
+                    task.Wait();
+                
+                task = new Task(() => {
                     try {
-                        PostCommentsGrabber.GragPost(postId.Value);
+                        new PostCommentsGrabber().GragPost(postId.Value);
                     }
                     catch (Exception e) {
                         log.Error("Post #" + postId + " not processed.", e);
                     }
+                });
+                task.Start();
+                //                finally {GC.Collect(0);}
 
+                DisplayStatus(postId);
 
-                    if (postId%10 == 0) {
-                        if (postId%100 == 0) {
-                            Console.WriteLine();
-                            Console.Write($"{postId} -> ");
-                        }
-                        Console.Write("*");
-                    }
+                using (var db = new DataContext()) {
                     postId = GetNextPostId(db);
                 }
+            }
+            task.Wait();
+
+        }
+
+        static IEnumerable<int> GetEnumerablePosts(int maxPostId) {
+            int? postId;
+            while (true) {
+                using (var db = new DataContext()) {
+                    postId = GetNextPostId(db);
+                }
+                DisplayStatus(postId);
+                if (maxPostId >= postId)
+                    yield return postId.Value;
+                else
+                    break;
+            }
+        }
+
+        static void DisplayStatus(int? postId) {
+            if (postId % 10 == 0) {
+                if (postId % 100 == 0) {
+                    Console.WriteLine();
+                    Console.Write($"{postId} -> ");
+                }
+                Console.Write("*");
             }
         }
 
@@ -53,7 +107,7 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
             var postId = 2;
             using (var db = new DataContext()) {
                 try {
-                    PostCommentsGrabber.GragPost(postId);
+                    new PostCommentsGrabber().GragPost(postId);
                 }
                 catch (Exception e) {
                     log.Error("Post #" + postId + " not processed.", e);
@@ -95,7 +149,7 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
                 IJobDetail job2 = JobBuilder.Create<NewsChecker>()
                     .WithIdentity("job2", "group1")
                     .Build();
-                IJobDetail job3 = JobBuilder.Create<PostCommentsGrabber>()
+                IJobDetail job3 = JobBuilder.Create<NewsChecker>()//PostCommentsGrabber>()
                     .WithIdentity("job3", "group1")
                     .Build();
 

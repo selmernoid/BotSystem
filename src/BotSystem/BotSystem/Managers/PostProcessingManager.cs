@@ -8,22 +8,22 @@ using DataContract;
 namespace BotSystem {
     public class PostProcessingManager {
 
-        public static User GetUser(DataContext db, string username) {
-            var user =
-                db.Users.Local.FirstOrDefault(x => x.Name == username) ??
-                db.Users.FirstOrDefault(x => x.Name == username);
-            if (user == null)
-                db.Users.Add(user = new User {Name = username});
-            return user;
-        }
+//        public static User GetUser(DataContext db, string username) {
+//            var user =
+//                db.Users.Local.FirstOrDefault(x => x.Name == username) ??
+//                db.Users.FirstOrDefault(x => x.Name == username);
+//            if (user == null)
+//                db.Users.Add(user = new User {Name = username});
+//            return user;
+//        }
 
         public static void ProcessingComment(DataContext db, int postId, IEnumerable<CommentInfo> comments, string author) {
             
-            Dictionary<string, User> users = new Dictionary<string, User>();
+//            Dictionary<string, User> users = new Dictionary<string, User>();
 
-            foreach (var userName in comments.Select(x => x.UserName).Distinct()) {
-                users[userName] = GetUser(db, userName);
-            }
+//            foreach (var userName in comments.Select(x => x.UserName).Distinct()) {
+//                users[userName] = GetUser(db, userName);
+//            }
 
             db.Configuration.AutoDetectChangesEnabled = false;
             try {
@@ -31,7 +31,8 @@ namespace BotSystem {
                     UserComment uc;
                     db.UserComments.Add(uc = new UserComment {
                         Id = comment.Id,
-                        User = users[comment.UserName],
+                        UserName = comment.UserName,
+//                        User = users[comment.UserName],
                         IsPostAuthor = comment.UserName.Equals(author),
                         Rating = comment.Rating,
                         PostId = postId,
