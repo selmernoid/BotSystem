@@ -28,7 +28,7 @@ namespace BotSystem.Jobs {
     }
 
     public static class UrlConstants {
-        public static string GlobalNew = "http://pikabu.ru/new";
-        public static string SpecifiedPost = "http://pikabu.ru/story/_";
+        public static string GlobalNew = "new";//"http://pikabu.ru/new";
+        public static string SpecifiedPost = "story/_"; //"http://pikabu.ru/story/_";
     }
 }

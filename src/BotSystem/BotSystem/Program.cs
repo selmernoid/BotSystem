@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,8 +23,13 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
         }
 
         static void Main(string[] args) {
+            var a = GCSettings.IsServerGC;
+            var b = GCSettings.LatencyMode;
+            var c = GCSettings.LargeObjectHeapCompactionMode;
+            System.Net.ServicePointManager.DefaultConnectionLimit = 100;
+
             ILog log = LogManager.GetLogger("Grabber");
-            Console.ReadKey();
+//            Console.WriteLine("Press any key to start.");Console.ReadKey();
             int? postId, maxPostId;
             using (var db = new DataContext()) {
                 maxPostId = db.Settings.FirstOrDefault(x => x.Name == "MaxPostId").ValueInt;
@@ -38,7 +44,9 @@ WHERE Name = 'CurrentPostId'").FirstOrDefault();
             //                }
             //            }
             //return;                
-            var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount / 2  };
+            var options = new ParallelOptions {
+                MaxDegreeOfParallelism = 1 //Environment.ProcessorCount
+            };
             var timer = new Stopwatch();
             timer.Start();
             Parallel.ForEach(GetEnumerablePosts(maxPostId.Value), options, (Id) => {

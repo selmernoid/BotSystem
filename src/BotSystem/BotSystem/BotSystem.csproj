@@ -73,6 +73,10 @@
       <HintPath>..\packages\Quartz.2.4.1\lib\net40\Quartz.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -88,6 +92,7 @@
     <Compile Include="Jobs\PostCommentsGrabber.cs" />
     <Compile Include="Jobs\NewsChecker.cs" />
     <Compile Include="Managers\PostProcessingManager.cs" />
+    <Compile Include="Models\AjaxComments.cs" />
     <Compile Include="Models\PostInfo.cs" />
     <Compile Include="Models\CommentInfo.cs" />
     <Compile Include="Program.cs" />
