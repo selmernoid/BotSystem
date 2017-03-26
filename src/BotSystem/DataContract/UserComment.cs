@@ -26,9 +26,18 @@ namespace DataContract
         public int? Rating { get; set; }
         public string Content { get; set; }
 
+        public ModificationType ModificationType { get; set; }
+        public string ModificationComment { get; set; }
+        
         public DateTime Created { get; set; }
         public virtual ICollection<CommentLink> Links { get; set; }
         public virtual ICollection<UserComment> ChildComments { get; set; }
         public int Level { get; set; }
+    }
+
+    public enum ModificationType {
+        None = 0,
+
+        Deleted = 1
     }
 }

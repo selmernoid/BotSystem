@@ -38,19 +38,19 @@ namespace BotSystem.Jobs {
         public void GragPost(int postId) {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            //            html = new HtmlWeb().Load(UrlConstants.SpecifiedPost + postId);
-            //            using (var client = new WebClient()) {
-            //                html.LoadHtml(client.DownloadString(UrlConstants.SpecifiedPost + postId));
-            //            }
+//                        html = new HtmlWeb().Load(UrlConstants.SpecifiedPost + postId);
+                        using (var client = new WebClient()) {
+                            html.LoadHtml(client.DownloadString("http://pikabu.ru/"+UrlConstants.SpecifiedPost + postId));
+                        }
 
             //http://pikabu.ru/story/afrika_obedinyonnaya_respublika_tanzaniya_kakoyto_znakomyiy_vid_4820359#comment_81152709
 
-            var restRequest = new RestRequest(UrlConstants.SpecifiedPost + postId, Method.GET);
-            
-            var restResponse = client.Execute(restRequest);
-            var en = Encoding.GetEncoding("windows-1251");
-            var ar = Encoding.Convert(Encoding.Default, en, Encoding.Default.GetBytes(restResponse.Content)).ToString();
-            html.LoadHtml(ar);
+//            var restRequest = new RestRequest(UrlConstants.SpecifiedPost + postId, Method.GET);
+//            
+//            var restResponse = client.Execute(restRequest);
+//            var en = Encoding.GetEncoding("windows-1251");
+//            var ar = Encoding.Convert(Encoding.Default, en, Encoding.Default.GetBytes(restResponse.Content)).ToString();
+//            html.LoadHtml(ar);
 
 
             var processingDateTime = DateTime.Now;
@@ -257,11 +257,12 @@ namespace BotSystem.Jobs {
             var commentDateTime = Helper.UnixTimeStampToDateTime(
                 double.Parse(
                     tempUser.QuerySelector("time.b-comment__time").Attributes.AttributesWithName("datetime").FirstOrDefault().Value));
-            //                    var content = tempHeader.QuerySelector(".b-comment__content");
+
+//            var content = tempHeader.QuerySelector(".b-comment__content");
             HtmlNode content = tempHeader.NextSibling;
-            while (content.GetAttributeValue("class", null) != "b-comment__content") {
+            while (content.GetAttributeValue("class", null) != "b-comment__content")
                 content = content.NextSibling;
-            }
+            
 
             var level = int.Parse(comment.Attributes.AttributesWithName("data-level").FirstOrDefault().Value);
             var commentInfo = new UserComment {
@@ -273,9 +274,17 @@ namespace BotSystem.Jobs {
                 ParentCommentId = parentId == 0 ? (int?) null : parentId,
                 Level = level,
                 Created = commentDateTime,
+                
 //                Post = dbPostEntry,
                 Links = new List<CommentLink>()
             };
+
+            var likeDeletedNode = content.QuerySelector("span[style=\"color: #888888;\"]");
+            var isDeleted = likeDeletedNode != null && likeDeletedNode.InnerText.StartsWith("Комментарий удален. Причина:", StringComparison.CurrentCultureIgnoreCase);
+            if (isDeleted) {
+                commentInfo.ModificationType = ModificationType.Deleted;
+                commentInfo.ModificationComment = likeDeletedNode.InnerText.Substring(29);
+            }
 
             content.QuerySelectorAll(".b-p_type_image > div.b-gifx > a")
                 .Select(x => x.GetAttributeValue("href", null)).ToList().ForEach(
